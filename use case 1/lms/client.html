@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Integrated System</title>
+    <style>
+      /* Styling sama seperti sebelumnya */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+      h1 {
+        text-align: center;
+        color: #4a90e2;
+        margin-top: 20px;
+      }
+      section {
+        max-width: 500px;
+        margin: 20px auto;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input[type="text"] {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      button {
+        padding: 10px;
+        background-color: #4a90e2;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #357abd;
+      }
+      pre {
+        background-color: #f0f4f8;
+        padding: 15px;
+        border-radius: 5px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      h2 {
+        color: #4a90e2;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Integrated System</h1>
+
+    <!-- SOAP Request Form -->
+    <section>
+      <h2>
+        Welcome to LMS <br />
+        You Get a Book Recommendation
+      </h2>
+      <form id="soapForm">
+        <label for="genre">Enter Genre:</label>
+        <input type="text" id="genre" name="genre" required />
+        <button type="button" onclick="getBookRecommendation()">Get Recommendation</button>
+      </form>
+      <h3>Response</h3>
+      <pre id="soapResponse">Waiting for response...</pre>
+    </section>
+
+    <!-- REST Request Form -->
+    <section>
+      <h2>
+        Welcome to the Library <br />
+        We Will Confirm Your Book Borrowing
+      </h2>
+      <form id="restForm">
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" name="userId" required />
+        <label for="bookName">Book Name:</label>
+        <input type="text" id="bookName" name="bookName" required />
+        <button type="button" onclick="confirmBorrow()">Confirm Borrow</button>
+      </form>
+      <h3>Response</h3>
+      <pre id="restResponse">Waiting for response...</pre>
+    </section>
+
+    <script>
+      // Function to call the SOAP service
+      function getBookRecommendation() {
+        const genre = document.getElementById("genre").value;
+        const soapRequest = `
+              <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                  <soapenv:Body>
+                      <getBookRecommendation>
+                          <genre>${genre}</genre>
+                      </getBookRecommendation>
+                  </soapenv:Body>
+              </soapenv:Envelope>
+          `;
+
+        fetch("http://localhost/myproject/lms/server.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/xml",
+          },
+          body: soapRequest,
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            // Parsing XML to extract data without XML tags
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data, "text/xml");
+            const recommendation = xmlDoc.getElementsByTagName("return")[0]?.textContent || "No recommendation found";
+            document.getElementById("soapResponse").innerText = recommendation;
+          })
+          .catch((error) => {
+            document.getElementById("soapResponse").innerText = "Error: " + error;
+          });
+      }
+
+      // Function to call the REST service
+      function confirmBorrow() {
+        const userId = document.getElementById("userId").value;
+        const bookName = document.getElementById("bookName").value;
+
+        fetch("http://localhost/myproject/lms/server.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            userId: userId,
+            book: bookName,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("restResponse").innerText = data.message;
+          })
+          .catch((error) => {
+            document.getElementById("restResponse").innerText = "Error: " + error;
+          });
+      }
+    </script>
+  </body>
+</html>
