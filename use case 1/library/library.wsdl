@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://localhost/myproject/library/server.php" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="LibraryService" targetNamespace="http://localhost/myproject/library/server.php">
+  <types>
+    <xsd:schema targetNamespace="http://localhost/myproject/library/server.php">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </xsd:schema>
+  </types>
+  <portType name="LibraryServicePort">
+    <operation name="getBookRecommendation">
+      <input message="tns:getBookRecommendationIn"/>
+    </operation>
+    <operation name="confirmBorrow">
+      <input message="tns:confirmBorrowIn"/>
+    </operation>
+  </portType>
+  <binding name="LibraryServiceBinding" type="tns:LibraryServicePort">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="getBookRecommendation">
+      <soap:operation soapAction="http://localhost/myproject/library/server.php#getBookRecommendation"/>
+      <input>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://localhost/myproject/library/server.php"/>
+      </input>
+      <output>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://localhost/myproject/library/server.php"/>
+      </output>
+    </operation>
+    <operation name="confirmBorrow">
+      <soap:operation soapAction="http://localhost/myproject/library/server.php#confirmBorrow"/>
+      <input>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://localhost/myproject/library/server.php"/>
+      </input>
+      <output>
+        <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://localhost/myproject/library/server.php"/>
+      </output>
+    </operation>
+  </binding>
+  <message name="getBookRecommendationIn">
+    <part name="genre" type="xsd:anyType"/>
+  </message>
+  <message name="confirmBorrowIn">
+    <part name="userId" type="xsd:anyType"/>
+    <part name="book" type="xsd:anyType"/>
+  </message>
+  <service name="LibraryServiceService">
+    <port name="LibraryServicePort" binding="tns:LibraryServiceBinding">
+      <soap:address location="http://localhost/myproject/library/server.php"/>
+    </port>
+  </service>
+</definitions>
